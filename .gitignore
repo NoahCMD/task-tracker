@@ -14,3 +14,8 @@ frontend/.nuxt/
 # OS/System
 .DS_Store
 Thumbs.db
+
+# Angular/Vite local container caches
+.angular/
+.vite/
+node_modules/
