@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from typing import List
+from pydantic import BaseModel
+from datetime import datetime
 
 from database import SessionLocal
 from models import Task
@@ -15,71 +18,71 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- Pydantic Schemas for Request/Response validation ---
+class TaskResponse(BaseModel):
+    id: int
+    title: str
+    completed: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class TaskCreate(BaseModel):
+    title: str
+
+class TaskUpdate(BaseModel):
+    completed: bool
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 @app.get("/")
 def root():
     return {"message": "Task Tracker API is running"}
 
 
-@app.get("/tasks")
-def get_tasks():
-
-    db: Session = SessionLocal()
-
-    tasks = db.query(Task).all()
-
-    return tasks
+# Enforce that this returns a List of TaskResponse objects
+@app.get("/tasks", response_model=List[TaskResponse])
+def get_tasks(db: Session = Depends(get_db)):
+    return db.query(Task).all()
 
 
-@app.post("/tasks")
-def create_task(title: str):
-
-    db: Session = SessionLocal()
-
-    new_task = Task(
-        title=title
-    )
-
+# Receive data via JSON Request Body instead of URL parameters
+@app.post("/tasks", response_model=TaskResponse)
+def create_task(task_data: TaskCreate, db: Session = Depends(get_db)):
+    new_task = Task(title=task_data.title)
     db.add(new_task)
-
     db.commit()
-
     db.refresh(new_task)
-
     return new_task
 
 
 @app.delete("/tasks/{task_id}")
-def delete_task(task_id: int):
-
-    db: Session = SessionLocal()
-
+def delete_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(Task).filter(Task.id == task_id).first()
-
     if not task:
-        return {"error": "Task not found"}
-
+        raise HTTPException(status_code=404, detail="Task not found")
+    
     db.delete(task)
-
     db.commit()
-
     return {"message": "Task deleted successfully"}
 
 
-@app.put("/tasks/{task_id}")
-def update_task(task_id: int, completed: bool):
-
-    db: Session = SessionLocal()
-
+# Receive update data via JSON Request Body
+@app.put("/tasks/{task_id}", response_model=TaskResponse)
+def update_task(task_id: int, task_data: TaskUpdate, db: Session = Depends(get_db)):
     task = db.query(Task).filter(Task.id == task_id).first()
-
     if not task:
-        return {"error": "Task not found"}
+        raise HTTPException(status_code=404, detail="Task not found")
 
-    task.completed = completed
-
+    task.completed = task_data.completed
     db.commit()
-
     db.refresh(task)
-
     return task
