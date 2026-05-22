@@ -1,0 +1,12 @@
+.container {
+  width: 600px;
+  margin: 40px auto;
+  font-family: Arial;
+}
+
+.task {
+  border: 1px solid #ccc;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
