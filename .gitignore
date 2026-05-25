@@ -19,3 +19,5 @@ Thumbs.db
 .angular/
 .vite/
 node_modules/
+frontend/public/videos/
+frontend/public/videos/
