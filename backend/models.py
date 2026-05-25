@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, text, Enum
+from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, text, Enum, Date, JSON
 from database import Base
 import enum
 
@@ -26,4 +26,8 @@ class Task(Base):
         server_default=text("CURRENT_TIMESTAMP")
     )
     priority = Column(Enum(TaskPriority), default=TaskPriority.MEDIUM, nullable=False)
-    due_date = Column(TIMESTAMP, nullable=True)
+    due_date = Column(Date, nullable=True)
+    tag = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    attachments = Column(JSON, nullable=True)
+    comments = Column(JSON, nullable=True)

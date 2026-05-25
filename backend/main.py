@@ -3,19 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
 from database import SessionLocal, engine
 from models import Task, TaskPriority, Base
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200", "http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +32,11 @@ class TaskResponse(BaseModel):
     completed: bool
     created_at: datetime
     priority: TaskPriorityEnum
-    due_date: Optional[datetime] = None  
+    due_date: Optional[date] = None
+    tag: Optional[str] = None
+    description: Optional[str] = None
+    attachments: Optional[List[dict]] = None
+    comments: Optional[List[dict]] = None
 
     class Config:
         from_attributes = True
@@ -40,10 +44,21 @@ class TaskResponse(BaseModel):
 class TaskCreate(BaseModel):
     title: str
     priority: Optional[TaskPriorityEnum] = TaskPriorityEnum.MEDIUM
-    due_date: Optional[datetime] = None  
+    due_date: Optional[date] = None
+    tag: Optional[str] = None
+    description: Optional[str] = None
+    attachments: Optional[List[dict]] = None
+    comments: Optional[List[dict]] = None
 
 class TaskUpdate(BaseModel):
-    completed: bool
+    title: Optional[str] = None
+    priority: Optional[TaskPriorityEnum] = None
+    due_date: Optional[date] = None
+    tag: Optional[str] = None
+    description: Optional[str] = None
+    attachments: Optional[List[dict]] = None
+    comments: Optional[List[dict]] = None
+    completed: Optional[bool] = None
 
 def get_db():
     db = SessionLocal()
@@ -72,7 +87,11 @@ def create_task(task_data: TaskCreate, db: Session = Depends(get_db)):
     new_task = Task(
         title=task_data.title,
         priority=task_data.priority,
-        due_date=task_data.due_date
+        due_date=task_data.due_date,
+        tag=task_data.tag,
+        description=task_data.description,
+        attachments=task_data.attachments,
+        comments=task_data.comments
     )
     db.add(new_task)
     db.commit()
@@ -95,7 +114,22 @@ def update_task(task_id: int, task_data: TaskUpdate, db: Session = Depends(get_d
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    task.completed = task_data.completed
+    if task_data.title is not None:
+        task.title = task_data.title
+    if task_data.description is not None:
+        task.description = task_data.description
+    if task_data.priority is not None:
+        task.priority = task_data.priority
+    if task_data.due_date is not None:
+        task.due_date = task_data.due_date
+    if task_data.tag is not None:
+        task.tag = task_data.tag
+    if task_data.attachments is not None:
+        task.attachments = task_data.attachments
+    if task_data.comments is not None:
+        task.comments = task_data.comments
+    if task_data.completed is not None:
+        task.completed = task_data.completed
     db.commit()
     db.refresh(task)
     return task
