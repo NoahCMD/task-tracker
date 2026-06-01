@@ -304,7 +304,14 @@ function App() {
         {attachments.slice(0, 3).map((file, idx) => (
           <span key={idx} className="task-attachment-preview">
             {file.type.startsWith('image/') ? (
-              <img src={file.data} alt={file.name} />
+              <a
+                href={file.data}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img src={file.data} alt={file.name} />
+              </a>
             ) : (
               file.name.split('.').pop().toUpperCase()
             )}

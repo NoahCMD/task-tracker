@@ -741,6 +741,25 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.jira-modal-main-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.jira-modal-main-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.jira-modal-main-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.jira-modal-main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .jira-modal-sidebar {
@@ -899,7 +918,11 @@ body {
 .jira-status-pill.active { background-color: rgba(37, 99, 235, 0.2); color: var(--accent-blue); }
 .jira-status-pill.done { background-color: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
 
-.archiving-panel { max-height: 85vh; overflow-y: auto; }
+.archiving-panel { max-height: 85vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.18) transparent; }
+.archiving-panel::-webkit-scrollbar { width: 8px; }
+.archiving-panel::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+.archiving-panel::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 999px; }
+.archiving-panel::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 .jira-task-card.completed .task-title { text-decoration: line-through; color: var(--text-muted); }
 .btn-delete { background: transparent; color: var(--text-muted); border: none; cursor: pointer; }
 .btn-delete:hover { color: #ef4444; }

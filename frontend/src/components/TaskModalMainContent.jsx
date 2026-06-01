@@ -57,7 +57,9 @@ export default function TaskModalMainContent({
             {editAttachments.map((file, idx) => (
               <div key={idx} className="jira-attachment-tile">
                 {file.type.startsWith('image/') ? (
-                  <img src={file.data} alt={file.name} className="jira-tile-media" />
+                  <a href={file.data} target="_blank" rel="noopener noreferrer">
+                    <img src={file.data} alt={file.name} className="jira-tile-media" />
+                  </a>
                 ) : file.type.startsWith('video/') ? (
                   <video src={file.data} controls className="jira-tile-media" />
                 ) : (
