@@ -9,8 +9,6 @@ from enum import Enum
 from database import SessionLocal, engine
 from models import Task, TaskPriority, Base
 
-# Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
 
 app.add_middleware(
